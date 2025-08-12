@@ -13,6 +13,7 @@ export interface ICashListItem {
   status: string;
   customer_GUID: string;
   bank_account: string;
+  customer_title: string;
   description: string;
 }
 

@@ -2,36 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import type { ICashListItem } from "@/utils/type";
 import { BASE_URL } from "./base";
 
-declare const _spPageContextInfo: {
-  webAbsoluteUrl: string;
-};
-
-export async function getCurrentUser(): Promise<string> {
-  const response = await fetch(
-    `${_spPageContextInfo.webAbsoluteUrl}/_api/web/currentuser`,
-    {
-      headers: { Accept: "application/json;odata=verbose" },
-      credentials: "same-origin",
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  const data = await response.json();
-  return data.d.LoginName;
-}
-
-export async function getAllCashListItems(
-  userGuid: string
-): Promise<ICashListItem[]> {
+export async function getAllCashListItems(): Promise<ICashListItem[]> {
   const listTitle = "Cash_List";
   let items: ICashListItem[] = [];
 
   let nextUrl:
     | string
-    | null = `${BASE_URL}/_api/web/lists/getbytitle('${listTitle}')/items?$top=100&$orderby=ID desc&$filter=customer_GUID eq '${userGuid}'`;
+    | null = `${BASE_URL}/_api/web/lists/getbytitle('${listTitle}')/items?$top=100&$orderby=ID desc`;
 
   while (nextUrl) {
     const res = await fetch(nextUrl, {
@@ -60,18 +37,10 @@ export async function getAllCashListItems(
   return items;
 }
 
-export function useUser() {
-  return useQuery<string, Error>({
-    queryKey: ["currentUser"],
-    queryFn: getCurrentUser,
-  });
-}
-
-export function useCashListItems(userGuid: string) {
+export function useCashListItems() {
   return useQuery<ICashListItem[], Error>({
-    queryKey: ["cashListItems", userGuid],
-    queryFn: () => getAllCashListItems(userGuid),
+    queryKey: ["cashListItems"],
+    queryFn: () => getAllCashListItems(),
     staleTime: 2000,
-    enabled: !!userGuid,
   });
 }
