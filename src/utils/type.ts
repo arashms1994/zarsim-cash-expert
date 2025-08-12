@@ -21,3 +21,13 @@ export interface ITableUIProps {
   data: ICashListItem[] | undefined;
   backgroundColor?: string;
 }
+
+export interface IFileDownloadLinkProps {
+  customerGuid: string;
+  itemGuid: string;
+}
+
+export interface IAttachmentFile {
+  fileName: string;
+  fileUrl: string;
+}

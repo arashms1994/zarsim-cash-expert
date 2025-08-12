@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ICashListItem } from "@/utils/type";
+import type { IAttachmentFile, ICashListItem } from "@/utils/type";
 import { BASE_URL } from "./base";
 
 export async function getAllCashListItems(): Promise<ICashListItem[]> {
@@ -44,3 +44,44 @@ export function useCashListItems() {
     staleTime: 2000,
   });
 }
+
+export const useAttachmentFiles = (customerGuid: string, itemGuid: string) => {
+  return useQuery<IAttachmentFile[], Error>({
+    queryKey: ["attachmentFiles", customerGuid, itemGuid],
+    queryFn: async () => {
+      if (!customerGuid || !itemGuid) {
+        throw new Error("Invalid parameters");
+      }
+
+      const folderPath = encodeURIComponent(`/Cash_AttachFiles/${customerGuid}/${itemGuid}`);
+
+      const url = `/crm/_api/web/GetFolderByServerRelativeUrl('${folderPath}')/Files`;
+
+      console.log("Fetching SharePoint files from:", url);
+
+      const response = await fetch(url, {
+        headers: {
+          "Accept": "application/json;odata=verbose",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      const json = await response.json();
+
+      const files: IAttachmentFile[] = json.d?.results?.map((file: any) => ({
+        fileUrl: file.ServerRelativeUrl,
+        fileName: file.Name,
+      })) || [];
+
+      console.log("SharePoint API response files:", files);
+
+      return files;
+    },
+    staleTime: 2000,
+    enabled: !!customerGuid && !!itemGuid,
+  });
+};
+

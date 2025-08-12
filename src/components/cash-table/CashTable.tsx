@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ICashListItem } from "@/utils/type";
 import { useCashListItems } from "@/api/getData";
+import { Skeleton } from "../ui/skeleton";
 import {
   ArrowUpDown,
   Check,
@@ -30,8 +31,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import FileDownloadLink from "../ui/FileDownloadLink";
 
-export const columns: ColumnDef<ICashListItem>[] = [
+const columns: ColumnDef<ICashListItem>[] = [
   {
     accessorKey: "reference_number",
     header: "شماره مرجع",
@@ -94,9 +96,27 @@ export const columns: ColumnDef<ICashListItem>[] = [
   {
     accessorKey: "description",
     header: "توضیحات",
-    cell: ({ row }) => <div>{row.getValue("description")}</div>,
+    cell: ({ row }) => (
+      <div>{row.getValue("description") || "توضیحاتی وجود ندارد."}</div>
+    ),
   },
 
+  {
+    id: "download",
+    header: "دانلود رسید",
+    cell: ({ row }) => {
+      const cashItem = row.original;
+      return (
+        <FileDownloadLink
+          customerGuid={cashItem.customer_GUID}
+          itemGuid={cashItem.Title}
+        />
+      );
+    },
+    enableSorting: false,
+    enableHiding: true,
+  },
+  
   {
     id: "actions",
     header: "عملیات",
@@ -142,7 +162,15 @@ export function CashTable() {
   });
 
   if (isLoading) {
-    return <div>در حال بارگذاری...</div>;
+    return (
+      <div className="flex flex-col space-y-3">
+        <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[250px]" />
+          <Skeleton className="h-4 w-[200px]" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -210,11 +238,6 @@ export function CashTable() {
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} از{" "}
-          {table.getFilteredRowModel().rows.length} ردیف انتخاب شده.
-        </div>
-
         <div className="space-x-2 flex items-center justify-center">
           <div
             className="flex items-center justify-center p-2 rounded-full hover:bg-slate-300 transition-all duration-300"
