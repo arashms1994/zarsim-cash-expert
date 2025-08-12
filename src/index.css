@@ -3,6 +3,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "Vazir";
+  src: url("/fonts/Vazir.woff2") format("woff2");
+  font-style: normal;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    font-family: "Vazir", system-ui;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Vazir", system-ui;
+  }
+}
+
+button {
+  min-width: none;
+  padding: 0px;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -108,13 +130,4 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }
