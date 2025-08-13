@@ -1,7 +1,7 @@
 import { BASE_URL } from "./base";
 import { getDigest } from "../utils/getDigest";
-import type { ICashListItem } from "@/utils/type";
 import { Bounce, toast } from "react-toastify";
+import type { ICashListItem } from "@/utils/type";
 
 export async function addCashReceipt(data: {
   Title: string;
@@ -91,18 +91,20 @@ export const handleApprove = async (cashItem: ICashListItem) => {
       },
       cashItem.ID
     );
-    toast.success("آیتم با موفقیت تایید شد.", {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Bounce,
-    });
-    console.log(`درخواست ${cashItem.ID} تأیید شد`);
+    toast.success(
+      `آیتم با شماره مرجع ${cashItem.reference_number} با موفقیت تأیید شد.`,
+      {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      }
+    );
   } catch (err) {
     console.error("خطا در تأیید درخواست:", err);
     toast.error("خطا در تایید آیتم!", {
@@ -116,6 +118,7 @@ export const handleApprove = async (cashItem: ICashListItem) => {
       theme: "colored",
       transition: Bounce,
     });
+    throw err;
   }
 };
 
@@ -131,18 +134,20 @@ export const handleReject = async (cashItem: ICashListItem) => {
       },
       cashItem.ID
     );
-    console.log(`درخواست ${cashItem.ID} رد شد`);
-    toast.success("آیتم با موفقیت رد شد.", {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Bounce,
-    });
+    toast.success(
+      `آیتم با شماره مرجع ${cashItem.reference_number} با موفقیت رد شد.`,
+      {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      }
+    );
   } catch (err) {
     console.error("خطا در رد درخواست:", err);
     toast.error("خطا در رد آیتم!", {
@@ -156,5 +161,6 @@ export const handleReject = async (cashItem: ICashListItem) => {
       theme: "colored",
       transition: Bounce,
     });
+    throw err;
   }
 };

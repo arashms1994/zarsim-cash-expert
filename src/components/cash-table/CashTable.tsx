@@ -6,10 +6,8 @@ import { useCashListItems } from "@/api/getData";
 import { Skeleton } from "../ui/skeleton";
 import {
   ArrowUpDown,
-  Check,
   CircleChevronLeft,
   CircleChevronRight,
-  X,
 } from "lucide-react";
 import {
   useReactTable,
@@ -32,7 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import FileDownloadLink from "../ui/FileDownloadLink";
-import { handleApprove, handleReject } from "@/api/addData";
+import { ActionsCell } from "../action-colomn/ActionCell";
 
 const columns: ColumnDef<ICashListItem>[] = [
   {
@@ -124,23 +122,11 @@ const columns: ColumnDef<ICashListItem>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const cashItem = row.original;
-      return (
-        <div className="space-x-2 flex items-center justify-center">
-          <div
-            className="flex items-center justify-center bg-green-400 p-2 rounded-full transition-all duration-300 hover:bg-green-600"
-            onClick={() => handleApprove(cashItem)}
-          >
-            <Check color="black" />
-          </div>
 
-          <div
-            className="flex items-center justify-center bg-red-400 p-2 rounded-full transition-all duration-300 hover:bg-red-600"
-            onClick={() => handleReject(cashItem)}
-          >
-            <X color="black" />
-          </div>
-        </div>
-      );
+      if (!cashItem.ID || !cashItem.Title) {
+        return <div className="text-red-500">داده‌های نامعتبر</div>;
+      }
+      return <ActionsCell cashItem={cashItem} />;
     },
   },
 ];

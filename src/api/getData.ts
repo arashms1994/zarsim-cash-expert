@@ -10,35 +10,41 @@ export async function getAllCashListItems(): Promise<ICashListItem[]> {
   const listTitle = "Cash_List";
   let items: ICashListItem[] = [];
 
-  let nextUrl:
-    | string
-    | null = `${BASE_URL}/_api/web/lists/getbytitle('${listTitle}')/items?$top=100&$orderby=ID desc`;
+  let nextUrl: string | null = `${BASE_URL}/_api/web/lists/getbytitle('${listTitle}')/items?$orderby=ID desc`;
 
-  while (nextUrl) {
-    const res = await fetch(nextUrl, {
-      headers: {
-        Accept: "application/json;odata=verbose",
-      },
-    });
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error("خطا در گرفتن آیتم‌های Cash_List: " + err);
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`خطا در گرفتن آیتم‌های Cash_List: ${err} (Status: ${res.status})`);
+      }
+
+      const json: { d: { results: ICashListItem[]; __next?: string } } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error("ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست");
+      }
+
+      items = [...items, ...results];
+      nextUrl = json.d.__next ?? null;
+
+      console.log(`دریافت ${results.length} آیتم. کل آیتم‌ها: ${items.length}, Next URL: ${nextUrl}`);
     }
 
-    const json: { d: { results: ICashListItem[]; __next?: string } } =
-      await res.json();
-
-    const results = json.d?.results;
-    if (!Array.isArray(results)) {
-      throw new Error("ساختار داده‌ی برگشتی نامعتبر است");
-    }
-
-    items = [...items, ...results];
-    nextUrl = json.d.__next ?? null;
+    console.log(`کل آیتم‌های دریافت‌شده: ${items.length}`);
+    return items;
+  } catch (err) {
+    console.error("خطا در دریافت آیتم‌های Cash_List:", err);
+    throw err;
   }
-
-  return items;
 }
 
 async function fetchFiles({
