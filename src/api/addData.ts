@@ -1,6 +1,7 @@
 import { BASE_URL } from "./base";
 import { getDigest } from "../utils/getDigest";
 import type { ICashListItem } from "@/utils/type";
+import { Bounce, toast } from "react-toastify";
 
 export async function addCashReceipt(data: {
   Title: string;
@@ -90,9 +91,31 @@ export const handleApprove = async (cashItem: ICashListItem) => {
       },
       cashItem.ID
     );
+    toast.success("آیتم با موفقیت تایید شد.", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
     console.log(`درخواست ${cashItem.ID} تأیید شد`);
   } catch (err) {
     console.error("خطا در تأیید درخواست:", err);
+    toast.error("خطا در تایید آیتم!", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
   }
 };
 
@@ -104,12 +127,34 @@ export const handleReject = async (cashItem: ICashListItem) => {
         count: cashItem.count,
         reference_number: cashItem.reference_number,
         due_date: cashItem.due_date,
-        status: "2", // رد
+        status: "2",
       },
       cashItem.ID
     );
     console.log(`درخواست ${cashItem.ID} رد شد`);
+    toast.success("آیتم با موفقیت رد شد.", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
   } catch (err) {
     console.error("خطا در رد درخواست:", err);
+    toast.error("خطا در رد آیتم!", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
   }
 };
