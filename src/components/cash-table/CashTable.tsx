@@ -92,13 +92,13 @@ const columns: ColumnDef<ICashListItem>[] = [
     cell: ({ row }) => <div>{row.getValue("bank_account")}</div>,
   },
 
-  {
-    accessorKey: "description",
-    header: "توضیحات",
-    cell: ({ row }) => (
-      <div>{row.getValue("description") || "توضیحاتی وجود ندارد."}</div>
-    ),
-  },
+  // {
+  //   accessorKey: "description",
+  //   header: "توضیحات",
+  //   cell: ({ row }) => (
+  //     <div>{row.getValue("description") || "توضیحاتی وجود ندارد."}</div>
+  //   ),
+  // },
 
   {
     id: "download",
