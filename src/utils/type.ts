@@ -31,3 +31,8 @@ export interface IAttachmentFile {
   fileName: string;
   fileUrl: string;
 }
+
+export interface IFile {
+  Name: string;
+  ServerRelativeUrl: string;
+}

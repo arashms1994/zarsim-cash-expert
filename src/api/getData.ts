@@ -1,6 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import type { IAttachmentFile, ICashListItem } from "@/utils/type";
 import { BASE_URL } from "./base";
+import { useQuery } from "@tanstack/react-query";
+import type {
+  ICashListItem,
+  IFile,
+  IFileDownloadLinkProps,
+} from "@/utils/type";
 
 export async function getAllCashListItems(): Promise<ICashListItem[]> {
   const listTitle = "Cash_List";
@@ -37,51 +41,65 @@ export async function getAllCashListItems(): Promise<ICashListItem[]> {
   return items;
 }
 
-export function useCashListItems() {
+async function fetchFiles({
+  customerGuid,
+  itemGuid,
+}: IFileDownloadLinkProps): Promise<IFile[]> {
+  if (!customerGuid || !itemGuid) {
+    throw new Error("شناسه مشتری یا آیتم نامعتبر است");
+  }
+
+  const folderPath = `/Cash_AttachFiles/${customerGuid}/${itemGuid}`;
+  const encodedFolderPath = encodeURIComponent(folderPath);
+
+  const url = `${BASE_URL}/_api/web/GetFolderByServerRelativeUrl('${encodedFolderPath}')/Files?$select=Name,ServerRelativeUrl`;
+  console.log("Fetch URL:", url);
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json;odata=verbose",
+      "Content-Type": "application/json;odata=verbose",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("لطفاً وارد حساب کاربری خود شوید");
+    }
+    throw new Error(`خطای HTTP! وضعیت: ${response.status}`);
+  }
+
+  const data = await response.json();
+  console.log("API Response:", data);
+
+  if (data.d && data.d.results && data.d.results.length > 0) {
+    return data.d.results.map((file: IFile) => ({
+      Name: file.Name,
+      ServerRelativeUrl: file.ServerRelativeUrl,
+    }));
+  }
+
+  return [];
+}
+
+export const useCashListItems = () => {
   return useQuery<ICashListItem[], Error>({
     queryKey: ["cashListItems"],
     queryFn: () => getAllCashListItems(),
     staleTime: 2000,
   });
-}
-
-export const useAttachmentFiles = (customerGuid: string, itemGuid: string) => {
-  return useQuery<IAttachmentFile[], Error>({
-    queryKey: ["attachmentFiles", customerGuid, itemGuid],
-    queryFn: async () => {
-      if (!customerGuid || !itemGuid) {
-        throw new Error("Invalid parameters");
-      }
-
-      const folderPath = encodeURIComponent(`/Cash_AttachFiles/${customerGuid}/${itemGuid}`);
-
-      const url = `/crm/_api/web/GetFolderByServerRelativeUrl('${folderPath}')/Files`;
-
-      console.log("Fetching SharePoint files from:", url);
-
-      const response = await fetch(url, {
-        headers: {
-          "Accept": "application/json;odata=verbose",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      }
-
-      const json = await response.json();
-
-      const files: IAttachmentFile[] = json.d?.results?.map((file: any) => ({
-        fileUrl: file.ServerRelativeUrl,
-        fileName: file.Name,
-      })) || [];
-
-      console.log("SharePoint API response files:", files);
-
-      return files;
-    },
-    staleTime: 2000,
-    enabled: !!customerGuid && !!itemGuid,
-  });
 };
 
+export const useFiles = ({
+  customerGuid,
+  itemGuid,
+}: IFileDownloadLinkProps) => {
+  return useQuery<IFile[], Error>({
+    queryKey: ["files", customerGuid, itemGuid],
+    queryFn: () => fetchFiles({ customerGuid, itemGuid }),
+    enabled: !!customerGuid && !!itemGuid,
+    staleTime: 60 * 1000,
+    retry: 2,
+  });
+};

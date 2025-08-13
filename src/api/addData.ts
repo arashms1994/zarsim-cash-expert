@@ -1,5 +1,6 @@
 import { BASE_URL } from "./base";
 import { getDigest } from "../utils/getDigest";
+import type { ICashListItem } from "@/utils/type";
 
 export async function addCashReceipt(data: {
   Title: string;
@@ -76,3 +77,39 @@ export async function updateCashReceipt(
     }
   }
 }
+
+export const handleApprove = async (cashItem: ICashListItem) => {
+  try {
+    await updateCashReceipt(
+      {
+        Title: cashItem.Title,
+        count: cashItem.count,
+        reference_number: cashItem.reference_number,
+        due_date: cashItem.due_date,
+        status: "1",
+      },
+      cashItem.ID
+    );
+    console.log(`درخواست ${cashItem.ID} تأیید شد`);
+  } catch (err) {
+    console.error("خطا در تأیید درخواست:", err);
+  }
+};
+
+export const handleReject = async (cashItem: ICashListItem) => {
+  try {
+    await updateCashReceipt(
+      {
+        Title: cashItem.Title,
+        count: cashItem.count,
+        reference_number: cashItem.reference_number,
+        due_date: cashItem.due_date,
+        status: "2", // رد
+      },
+      cashItem.ID
+    );
+    console.log(`درخواست ${cashItem.ID} رد شد`);
+  } catch (err) {
+    console.error("خطا در رد درخواست:", err);
+  }
+};

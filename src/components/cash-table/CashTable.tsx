@@ -32,6 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import FileDownloadLink from "../ui/FileDownloadLink";
+import { handleApprove, handleReject } from "@/api/addData";
 
 const columns: ColumnDef<ICashListItem>[] = [
   {
@@ -116,22 +117,31 @@ const columns: ColumnDef<ICashListItem>[] = [
     enableSorting: false,
     enableHiding: true,
   },
-  
+
   {
     id: "actions",
     header: "عملیات",
     enableHiding: false,
-    cell: () => (
-      <div className="space-x-2 flex items-center justify-center">
-        <div className="flex items-center justify-center bg-green-400 p-2 rounded-full transition-all duration-300 hover:bg-green-600">
-          <Check color="black" />
-        </div>
+    cell: ({ row }) => {
+      const cashItem = row.original;
+      return (
+        <div className="space-x-2 flex items-center justify-center">
+          <div
+            className="flex items-center justify-center bg-green-400 p-2 rounded-full transition-all duration-300 hover:bg-green-600"
+            onClick={() => handleApprove(cashItem)}
+          >
+            <Check color="black" />
+          </div>
 
-        <div className="flex items-center justify-center bg-red-400 p-2 rounded-full transition-all duration-300 hover:bg-red-600">
-          <X color="black" />
+          <div
+            className="flex items-center justify-center bg-red-400 p-2 rounded-full transition-all duration-300 hover:bg-red-600"
+            onClick={() => handleReject(cashItem)}
+          >
+            <X color="black" />
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   },
 ];
 
