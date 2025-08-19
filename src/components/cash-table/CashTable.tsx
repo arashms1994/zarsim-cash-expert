@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table";
 import FileDownloadLink from "../ui/FileDownloadLink";
 import { ActionsCell } from "../action-colomn/ActionCell";
+import { formatNumberWithComma } from "@/utils/formatNumberWithComma";
 
 const columns: ColumnDef<ICashListItem>[] = [
   {
@@ -83,7 +84,9 @@ const columns: ColumnDef<ICashListItem>[] = [
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue("count")}</div>,
+    cell: ({ row }) => (
+      <div>{formatNumberWithComma(row.getValue("count"))}</div>
+    ),
   },
 
   {
