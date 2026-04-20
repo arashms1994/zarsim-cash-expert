@@ -23,4 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
+# base
 base.ts
+
+# docs
+docs.md
